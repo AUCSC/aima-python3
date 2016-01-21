@@ -963,3 +963,7 @@ __doc__ += random_tests("""
 >>> weighted_sample_with_replacement(range(10), [x*x for x in range(10)], 3)
 [8, 9, 6]
 """)
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
