@@ -2,14 +2,10 @@
 
 """
 
-
 import operator, math, random, copy, sys, os.path, bisect, re
 import collections
 from functools import reduce
-
-#______________________________________________________________________________
 # Compatibility with Python 2.2, 2.3, and 2.4 removed
-
 #______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
 
