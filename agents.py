@@ -622,3 +622,6 @@ class EnvToolbar(tk.Frame, object):
     def set_speed(self, speed):
         self.speed = float(speed)
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
