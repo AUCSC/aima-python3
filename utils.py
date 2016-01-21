@@ -4,54 +4,19 @@
 
 import operator, math, random, copy, sys, os.path, bisect, re
 import collections
-from functools import reduce
+import statistics
+from functools import reduce, namedtuple
+
 # Compatibility with Python 2.2, 2.3, and 2.4 removed
 #______________________________________________________________________________
 # Simple Data Structures: infinity, Dict, Struct
 
 infinity = 1.0e400
 
-def Dict(**entries):
-    """Create a dict out of the argument=value arguments.
-    >>> Dict(a=1, b=2, c=3)
-    {'a': 1, 'c': 3, 'b': 2}
-    """
-    return entries
-
-class DefaultDict(dict):
-    """Dictionary with a default value for unknown keys."""
-    def __init__(self, default):
-        self.default = default
-
-    def __getitem__(self, key):
-        if key in self: return self.get(key)
-        return self.setdefault(key, copy.deepcopy(self.default))
-
-    def __copy__(self):
-        copy = DefaultDict(self.default)
-        copy.update(self)
-        return copy
-
-class Struct:
-    """Create an instance with argument=value slots.
-    This is for making a lightweight object whose class doesn't matter."""
-    def __init__(self, **entries):
-        self.__dict__.update(entries)
-
-    def __cmp__(self, other):
-        if isinstance(other, Struct):
-            return cmp(self.__dict__, other.__dict__)
-        else:
-            return cmp(self.__dict__, other)
-
-    def __repr__(self):
-        args = ['%s=%s' % (k, repr(v)) for (k, v) in list(vars(self).items())]
-        return 'Struct(%s)' % ', '.join(sorted(args))
-
 def update(x, **entries):
     """Update a dict; or an object with slots; according to entries.
-    >>> update({'a': 1}, a=10, b=20)
-    {'a': 10, 'b': 20}
+    >>> d = update({'a': 1}, a=10, b=20); (d['a'], d['b'])
+    (10, 20)
     >>> update(Struct(a=1), a=10, b=20)
     Struct(a=10, b=20)
     """
@@ -248,16 +213,7 @@ def median(values):
     >>> median([1, 2, 3, 4])
     2.5
     """
-    n = len(values)
-    values = sorted(values)
-    if n % 2 == 1:
-        return values[n/2]
-    else:
-        middle2 = values[(n/2)-1:(n/2)+1]
-        try:
-            return mean(middle2)
-        except TypeError:
-            return random.choice(middle2)
+    return statistics.median(values)
 
 def mean(values):
     """Return the arithmetic average of the values."""
@@ -569,31 +525,13 @@ def random_tests(text):
 #______________________________________________________________________________
 
 __doc__ += """
->>> d = DefaultDict(0)
->>> d['x'] += 1
->>> d['x']
-1
-
->>> d = DefaultDict([])
->>> d['x'] += [1]
->>> d['y'] += [2]
->>> d['x']
-[1]
-
->>> s = Struct(a=1, b=2)
->>> s.a
-1
->>> s.a = 3
->>> s
-Struct(a=3, b=2)
-
 >>> def is_even(x):
 ...     return x % 2 == 0
 >>> sorted([1, 2, -3])
 [-3, 1, 2]
 >>> sorted(range(10), key=is_even)
 [1, 3, 5, 7, 9, 0, 2, 4, 6, 8]
->>> sorted(range(10), lambda x,y: y-x)
+>>> sorted(range(10), reverse=True)
 [9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
 
 >>> removeall(4, [])
@@ -620,24 +558,25 @@ Struct(a=3, b=2)
 
 
 # Test of memoize with slots in structures
->>> countries = [Struct(name='united states'), Struct(name='canada')]
+# This can be simplified with new structures.
+# >>> countries = [Struct(name='united states'), Struct(name='canada')]
 
 # Pretend that 'gnp' was some big hairy operation:
->>> def gnp(country):
-...     print 'calculating gnp ...'
-...     return len(country.name) * 1e10
+#>>> def gnp(country):
+#...     print('calculating gnp ...')
+#...     return len(country.name) * 1e10
 
->>> gnp = memoize(gnp, '_gnp')
->>> map(gnp, countries)
-calculating gnp ...
-calculating gnp ...
-[130000000000.0, 60000000000.0]
->>> countries
-[Struct(_gnp=130000000000.0, name='united states'), Struct(_gnp=60000000000.0, name='canada')]
+#>>> gnp = memoize(gnp, '_gnp')
+#>>> list(map(gnp, countries))
+#calculating gnp ...
+#calculating gnp ...
+#[130000000000.0, 60000000000.0]
+#>>> countries
+#[Struct(_gnp=130000000000.0, name='united states'), Struct(_gnp=60000000000.0, name='canada')]
 
 # This time we avoid re-doing the calculation
->>> map(gnp, countries)
-[130000000000.0, 60000000000.0]
+#>>> map(gnp, countries)
+# [130000000000.0, 60000000000.0]
 
 # Test Queues:
 >>> nums = [1, 8, 2, 7, 5, 6, -99, 99, 4, 3, 0]
@@ -670,7 +609,7 @@ calculating gnp ...
 >>> histogram(vals, 1)
 [(200, 3), (160, 2), (110, 2), (220, 1), (100, 1)]
 >>> histogram(vals, 1, lambda v: round(v, -2))
-[(200.0, 6), (100.0, 3)]
+[(200, 6), (100, 3)]
 
 >>> log2(1.0)
 0.0
@@ -705,10 +644,10 @@ calculating gnp ...
 True
 >>> 'a' in bcd
 False
->>> list(abc.intersection(bcd))
-['c', 'b']
->>> list(abc.union(bcd))
-['a', 'c', 'b', 'd']
+>>> sorted(abc.intersection(bcd))
+['b', 'c']
+>>> sorted(abc.union(bcd))
+['a', 'b', 'c', 'd']
 
 ## From "What's new in Python 2.4", but I added calls to sl
 

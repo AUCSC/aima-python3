@@ -872,7 +872,7 @@ def standardize_variables(sentence, dic=None):
     >>> len(variables(standardize_variables(e)))
     3
     >>> variables(e).intersection(variables(standardize_variables(e)))
-    set([])
+    set()
     >>> is_variable(standardize_variables(expr('x')))
     True
     """
@@ -1171,8 +1171,9 @@ False
 False
 
 ### An earlier version of the code failed on this:
->>> dpll_satisfiable(A & ~B & C & (A | ~D) & (~E | ~D) & (C | ~D) & (~A | ~F) & (E | ~F) & (~D | ~F) & (B | ~C | D) & (A | ~E | F) & (~A | E | D))
-{B: False, C: True, A: True, F: False, D: True, E: False}
+>>> d = dpll_satisfiable(A & ~B & C & (A | ~D) & (~E | ~D) & (C | ~D) & (~A | ~F) & (E | ~F) & (~D | ~F) & (B | ~C | D) & (A | ~E | F) & (~A | E | D))
+>>> (d[A], d[B], d[C], d[D], d[E], d[F])
+(True, False, True, True, False, False)
 
 ### [Fig. 7.13]
 >>> alpha = expr("~P12")
