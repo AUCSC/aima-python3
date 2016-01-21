@@ -27,6 +27,7 @@ And a few other functions:
 import itertools, re
 import agents
 from utils import *
+from collections import defaultdict
 
 #______________________________________________________________________________
 
@@ -608,7 +609,7 @@ def pl_fc_entails(KB, q):
     """
     count = dict([(c, len(conjuncts(c.args[0]))) for c in KB.clauses
                                                  if c.op == '>>'])
-    inferred = DefaultDict(False)
+    inferred = defaultdict(lambda: False)
     agenda = [s for s in KB.clauses if is_prop_symbol(s.op)]
     while agenda:
         p = agenda.pop()
