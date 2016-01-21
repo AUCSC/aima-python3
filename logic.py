@@ -1197,3 +1197,6 @@ False
 >>> to_cnf((P&Q) | (~P & ~Q))
 ((~P | P) & (~Q | P) & (~P | Q) & (~Q | Q))
 """
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
